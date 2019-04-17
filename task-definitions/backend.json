@@ -1,0 +1,15 @@
+[
+    {
+	"cpu": ${cpu},
+	"essential": true,
+	"image": "nginx:latest",
+	"memory": ${memory},
+	"name": "backend",
+	"portMappings": [
+            {
+		"containerPort": 80,
+		"hostPort": 80
+            }
+	]
+    }
+]
