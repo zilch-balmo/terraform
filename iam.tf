@@ -15,3 +15,47 @@ resource "aws_iam_group_policy_attachment" "administrators" {
   group      = "${aws_iam_group.administrators.name}"
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
+
+resource "aws_iam_group" "ci" {
+  name = "ci"
+}
+
+resource "aws_iam_policy" "ci" {
+  name   = "ci"
+  policy = "${data.aws_iam_policy_document.ci.json}"
+}
+
+resource "aws_iam_group_policy_attachment" "ci" {
+  group      = "${aws_iam_group.ci.name}"
+  policy_arn = "${aws_iam_policy.ci.arn}"
+}
+
+resource "aws_iam_user" "ci" {
+  name = "ci"
+}
+
+resource "aws_iam_user_group_membership" "ci" {
+  user = "${aws_iam_user.ci.name}"
+
+  groups = [
+    "${aws_iam_group.ci.name}",
+  ]
+}
+
+data "aws_iam_policy_document" "ci" {
+  statement {
+    actions = [
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:BatchGetImage",
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:PutImage",
+      "ecr:InitiateLayerUpload",
+      "ecr:UploadLayerPart",
+      "ecr:CompleteLayerUpload",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}
