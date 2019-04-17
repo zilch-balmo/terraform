@@ -1,3 +1,6 @@
+/* Create application load balancer.
+ */
+
 resource "aws_alb" "main" {
   name = "alb"
 
@@ -8,6 +11,10 @@ resource "aws_alb" "main" {
   security_groups = [
     "${aws_security_group.alb.id}",
   ]
+
+  tags = {
+    Name = "zilch"
+  }
 }
 
 resource "aws_alb_target_group" "backend" {
@@ -16,6 +23,10 @@ resource "aws_alb_target_group" "backend" {
   protocol    = "HTTP"
   vpc_id      = "${aws_vpc.main.id}"
   target_type = "ip"
+
+  tags = {
+    Name = "backend"
+  }
 }
 
 resource "aws_alb_listener" "backend" {

@@ -1,13 +1,27 @@
+/* Define services.
+ */
+
 locals {
   cpu    = 256
   memory = 512
 }
 
+resource "aws_cloudwatch_log_group" "backend" {
+  name              = "/fargate/service/backend"
+  retention_in_days = "14"
+
+  tags {
+    Name = "backend"
+  }
+}
+
 data "template_file" "container_definitions" {
   template = "${file("${path.module}/task-definitions/backend.json")}"
+
   vars = {
-    cpu    = "${local.cpu}"
-    memory = "${local.cpu}"
+    cpu       = "${local.cpu}"
+    memory    = "${local.memory}"
+    log_group = "${aws_cloudwatch_log_group.backend.name}"
   }
 }
 
@@ -18,9 +32,11 @@ resource "aws_ecs_cluster" "backend" {
 resource "aws_ecs_task_definition" "backend" {
   container_definitions    = "${data.template_file.container_definitions.rendered}"
   cpu                      = "${local.cpu}"
+  execution_role_arn       = "${aws_iam_role.ecs.arn}"
   family                   = "backend"
   memory                   = "${local.memory}"
   network_mode             = "awsvpc"
+  task_role_arn            = "${aws_iam_role.backend.arn}"
   requires_compatibilities = ["FARGATE"]
 }
 
@@ -36,7 +52,7 @@ resource "aws_ecs_service" "backend" {
   ]
 
   network_configuration {
-    security_groups = ["${aws_security_group.ecs.id}"]
+    security_groups = ["${aws_security_group.backend.id}"]
     subnets         = ["${aws_subnet.private.*.id}"]
   }
 

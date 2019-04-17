@@ -59,6 +59,10 @@ data "aws_iam_policy_document" "ci" {
       "ecr:InitiateLayerUpload",
       "ecr:PutImage",
       "ecr:UploadLayerPart",
+      "ecs:DescribeServices",
+      "ecs:DescribeTaskDefinition",
+      "ecs:UpdateService",
+      "ecs:RegisterTaskDefinition",
     ]
 
     resources = [
@@ -67,16 +71,58 @@ data "aws_iam_policy_document" "ci" {
   }
 }
 
+/* ECS */
+
+resource "aws_iam_role" "ecs" {
+  name               = "ecs"
+  assume_role_policy = "${data.aws_iam_policy_document.ecs.json}"
+}
+
+resource "aws_iam_role_policy_attachment" "ecs" {
+  role       = "${aws_iam_role.ecs.name}"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
 /* Backend */
 
-
-/*
 resource "aws_iam_role" "backend" {
-  name = "backend"
+  name               = "backend"
+  assume_role_policy = "${data.aws_iam_policy_document.ecs.json}"
 }
 
 resource "aws_iam_role_policy" "backend" {
-  name = "backend"
+  name   = "backend"
+  policy = "${data.aws_iam_policy_document.backend.json}"
+  role   = "${aws_iam_role.backend.id}"
 }
-*/
 
+data "aws_iam_policy_document" "ecs" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["ecs-tasks.amazonaws.com"]
+    }
+
+    actions = [
+      "sts:AssumeRole",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "backend" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:PutLogEventsBatch",
+    ]
+
+    resources = [
+      "arn:aws:logs:*",
+    ]
+  }
+}

@@ -1,3 +1,6 @@
+/* Define VPC network.
+ */
+
 locals {
   # we need at least two availability zones; we can scale up to four
   az_count     = 2
@@ -21,7 +24,7 @@ resource "aws_subnet" "private" {
   vpc_id            = "${aws_vpc.main.id}"
 
   tags = {
-    Name = "zilch-private"
+    Name = "private"
   }
 }
 
@@ -33,12 +36,16 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "zilch-public"
+    Name = "public"
   }
 }
 
 resource "aws_internet_gateway" "public" {
   vpc_id = "${aws_vpc.main.id}"
+
+  tags = {
+    Name = "zilch"
+  }
 }
 
 resource "aws_route" "internet_access" {
@@ -60,6 +67,10 @@ resource "aws_nat_gateway" "nat" {
   count         = "${local.az_count}"
   subnet_id     = "${element(aws_subnet.public.*.id, count.index)}"
   allocation_id = "${element(aws_eip.nat.*.id, count.index)}"
+
+  tags = {
+    Name = "zilch"
+  }
 }
 
 resource "aws_route_table" "private" {
@@ -69,6 +80,10 @@ resource "aws_route_table" "private" {
   route {
     cidr_block     = "0.0.0.0/0"
     nat_gateway_id = "${element(aws_nat_gateway.nat.*.id, count.index)}"
+  }
+
+  tags = {
+    Name = "zilch"
   }
 }
 

@@ -10,6 +10,14 @@
 		"containerPort": 80,
 		"hostPort": 80
             }
-	]
+	],
+	"logConfiguration": {
+	    "logDriver": "awslogs",
+	    "options": {
+		"awslogs-group": "${log_group}",
+		"awslogs-region": "us-west-2",
+		"awslogs-stream-prefix": "ecs"
+	    }
+	}
     }
 ]

@@ -1,3 +1,6 @@
+/* Define security groups into ALB and from ALB to ECS.
+ */
+
 resource "aws_security_group" "alb" {
   name   = "alb"
   vpc_id = "${aws_vpc.main.id}"
@@ -15,10 +18,14 @@ resource "aws_security_group" "alb" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = "alb"
+  }
 }
 
-resource "aws_security_group" "ecs" {
-  name   = "ecs"
+resource "aws_security_group" "backend" {
+  name   = "backend"
   vpc_id = "${aws_vpc.main.id}"
 
   ingress {
@@ -36,5 +43,9 @@ resource "aws_security_group" "ecs" {
     from_port   = 0
     to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "backend"
   }
 }
