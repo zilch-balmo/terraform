@@ -1,61 +1,58 @@
-/* Define VPC network.
- */
-
 locals {
-  # we need at least two availability zones; we can scale up to four
-  az_count     = 2
+  # We can scale up to four az. We must have at least two.
+  min_az_count = 2
   max_az_count = 4
 }
 
 data "aws_availability_zones" "available" {}
 
-resource "aws_vpc" "main" {
-  cidr_block = "10.10.0.0/16"
+resource "aws_vpc" "vpc" {
+  cidr_block = "${var.cidr_block}"
 
   tags = {
-    Name = "zilch"
+    Name = "${var.name}"
   }
 }
 
 resource "aws_subnet" "private" {
-  count             = "${local.az_count}"
-  cidr_block        = "${cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)}"
+  count             = "${local.min_az_count}"
+  cidr_block        = "${cidrsubnet(aws_vpc.vpc.cidr_block, 8, count.index)}"
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
-  vpc_id            = "${aws_vpc.main.id}"
+  vpc_id            = "${aws_vpc.vpc.id}"
 
   tags = {
-    Name = "private"
+    Name = "${var.name}.private"
   }
 }
 
 resource "aws_subnet" "public" {
-  count                   = "${local.az_count}"
-  cidr_block              = "${cidrsubnet(aws_vpc.main.cidr_block, 8, local.max_az_count + count.index)}"
+  count                   = "${local.min_az_count}"
+  cidr_block              = "${cidrsubnet(aws_vpc.vpc.cidr_block, 8, local.max_az_count + count.index)}"
   availability_zone       = "${data.aws_availability_zones.available.names[count.index]}"
-  vpc_id                  = "${aws_vpc.main.id}"
+  vpc_id                  = "${aws_vpc.vpc.id}"
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "public"
+    Name = "${var.name}.public"
   }
 }
 
 resource "aws_internet_gateway" "public" {
-  vpc_id = "${aws_vpc.main.id}"
+  vpc_id = "${aws_vpc.vpc.id}"
 
   tags = {
-    Name = "zilch"
+    Name = "${var.name}"
   }
 }
 
 resource "aws_route" "internet_access" {
-  route_table_id         = "${aws_vpc.main.main_route_table_id}"
+  route_table_id         = "${aws_vpc.vpc.main_route_table_id}"
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = "${aws_internet_gateway.public.id}"
 }
 
 resource "aws_eip" "nat" {
-  count = "${local.az_count}"
+  count = "${local.min_az_count}"
   vpc   = true
 
   depends_on = [
@@ -64,18 +61,18 @@ resource "aws_eip" "nat" {
 }
 
 resource "aws_nat_gateway" "nat" {
-  count         = "${local.az_count}"
+  count         = "${local.min_az_count}"
   subnet_id     = "${element(aws_subnet.public.*.id, count.index)}"
   allocation_id = "${element(aws_eip.nat.*.id, count.index)}"
 
   tags = {
-    Name = "zilch"
+    Name = "${var.name}"
   }
 }
 
 resource "aws_route_table" "private" {
-  count  = "${local.az_count}"
-  vpc_id = "${aws_vpc.main.id}"
+  count  = "${local.min_az_count}"
+  vpc_id = "${aws_vpc.vpc.id}"
 
   route {
     cidr_block     = "0.0.0.0/0"
@@ -83,12 +80,12 @@ resource "aws_route_table" "private" {
   }
 
   tags = {
-    Name = "zilch"
+    Name = "${var.name}"
   }
 }
 
 resource "aws_route_table_association" "private" {
-  count          = "${local.az_count}"
+  count          = "${local.min_az_count}"
   subnet_id      = "${element(aws_subnet.private.*.id, count.index)}"
   route_table_id = "${element(aws_route_table.private.*.id, count.index)}"
 }

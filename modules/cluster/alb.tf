@@ -1,9 +1,17 @@
 /* Create application load balancer.
  */
 
+data "aws_subnet_ids" "public" {
+  vpc_id = "${var.vpc_id}"
+
+  tags = {
+    Name = "${var.name}.public"
+  }
+}
+
 resource "aws_security_group" "alb" {
-  name   = "alb"
-  vpc_id = "${aws_vpc.main.id}"
+  name   = "${var.name}.${var.tier}.alb"
+  vpc_id = "${var.vpc_id}"
 
   ingress {
     protocol    = "tcp"
@@ -20,15 +28,19 @@ resource "aws_security_group" "alb" {
   }
 
   tags = {
-    Name = "alb"
+    Name = "${var.name}.${var.tier}.alb"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
-resource "aws_alb" "main" {
-  name = "alb"
+resource "aws_alb" "alb" {
+  name = "${var.name}-${var.tier}"
 
   subnets = [
-    "${aws_subnet.public.*.id}",
+    "${data.aws_subnet_ids.public.ids}",
   ]
 
   security_groups = [
@@ -36,6 +48,6 @@ resource "aws_alb" "main" {
   ]
 
   tags = {
-    Name = "zilch"
+    Name = "${var.name}.${var.tier}"
   }
 }
