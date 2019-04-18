@@ -9,6 +9,32 @@ data "aws_secretsmanager_secret_version" "rds_master_password" {
   secret_id = "${data.aws_secretsmanager_secret.rds_master_password.id}"
 }
 
+resource "aws_security_group" "postgres" {
+  name   = "postgres"
+  vpc_id = "${aws_vpc.main.id}"
+
+  ingress {
+    protocol  = "tcp"
+    from_port = 5432
+    to_port   = 5432
+
+    security_groups = [
+      "${aws_security_group.backend.id}",
+    ]
+  }
+
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "postgres"
+  }
+}
+
 resource "aws_db_subnet_group" "postgres" {
   name = "postgres"
 

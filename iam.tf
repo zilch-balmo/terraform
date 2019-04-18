@@ -83,19 +83,6 @@ resource "aws_iam_role_policy_attachment" "ecs" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-/* Backend */
-
-resource "aws_iam_role" "backend" {
-  name               = "backend"
-  assume_role_policy = "${data.aws_iam_policy_document.ecs.json}"
-}
-
-resource "aws_iam_role_policy" "backend" {
-  name   = "backend"
-  policy = "${data.aws_iam_policy_document.backend.json}"
-  role   = "${aws_iam_role.backend.id}"
-}
-
 data "aws_iam_policy_document" "ecs" {
   statement {
     effect = "Allow"
@@ -107,22 +94,6 @@ data "aws_iam_policy_document" "ecs" {
 
     actions = [
       "sts:AssumeRole",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "backend" {
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "logs:PutLogEventsBatch",
-    ]
-
-    resources = [
-      "arn:aws:logs:*",
     ]
   }
 }
