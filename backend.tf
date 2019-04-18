@@ -20,6 +20,30 @@ resource "aws_cloudwatch_log_group" "backend" {
 }
 
 
+# Secrets
+
+resource "aws_secretsmanager_secret" "backend" {
+  name = "backend"
+}
+
+resource "random_string" "backend_postgres_password" {
+  length = 32
+}
+
+locals {
+  secrets = {
+    postgres = {
+      host = "${random_string.backend_postgres_password.result}"
+    }
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "backend" {
+  secret_id     = "${aws_secretsmanager_secret.backend.id}"
+  secret_string = "${jsonencode(local.secrets)}"
+}
+
+
 # IAM
 
 resource "aws_iam_role" "backend" {
@@ -38,13 +62,13 @@ data "aws_iam_policy_document" "backend" {
     effect = "Allow"
 
     actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "logs:PutLogEventsBatch",
+      "secretsmanager:Describe*",
+      "secretsmanager:Get*",
+      "secretsmanager:List*"
     ]
 
     resources = [
-      "arn:aws:logs:*",
+      "${aws_secretsmanager_secret.backend.arn}",
     ]
   }
 }
