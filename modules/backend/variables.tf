@@ -1,4 +1,6 @@
 variable "alb_id" {}
+variable "alb_dns_name" {}
+variable "alb_zone_id" {}
 variable "cluster_id" {}
 variable "database_host" {}
 variable "execution_role_arn" {}
@@ -14,3 +16,4 @@ variable "fargate_memory" {
 variable "name" {}
 variable "security_group_id" {}
 variable "vpc_id" {}
+variable "zone_id" {}

@@ -55,7 +55,8 @@ resource "aws_ecs_service" "backend" {
   task_definition = "${aws_ecs_task_definition.backend.arn}"
 
   depends_on = [
-    "aws_alb_listener.backend",
+    "aws_alb_listener.backend_http",
+    "aws_alb_listener.backend_https",
   ]
 
   network_configuration {
