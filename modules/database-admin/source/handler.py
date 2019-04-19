@@ -1,5 +1,5 @@
 from boto3 import Session
-# XXX from psycopg2 import connect
+from psycopg2 import connect
 
 
 def find_rds_address(session):
@@ -24,16 +24,27 @@ def find_rds_master_password(session):
     return response["SecretString"]
 
 
+def list_databases(**kwargs):
+    with connect(**kwargs) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT datname FROM pg_database WHERE datistemplate = false;")
+            for name, *_ in cursor.fetchall():
+                print(name)
+
+
 def main(event, context):
     """
     Handler function.
 
     """
     session = Session()
+
     host = find_rds_address(session)
     password = find_rds_master_password(session)
 
-    return dict(
+    list_databases(
+        dbname="postgres",
+        user="postgres",
+        password=password,
         host=host,
-        password=len(password),
     )
