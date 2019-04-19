@@ -45,6 +45,7 @@ data "aws_iam_policy_document" "database_admin" {
 
     resources = [
       "arn:aws:secretsmanager:us-west-2:534764804984:secret:rds_master_password-??????",
+      "arn:aws:secretsmanager:us-west-2:534764804984:secret:secrets//backend-??????",
     ]
   }
 }
