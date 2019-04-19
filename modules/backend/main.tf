@@ -13,6 +13,10 @@ data "aws_subnet_ids" "private" {
 
 resource "aws_ecr_repository" "backend" {
   name = "backend"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # ECS

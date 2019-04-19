@@ -45,6 +45,15 @@ module "database" {
   ]
 }
 
+# enable database administration via a lambda function
+module "database-admin" {
+  source = "modules/database-admin"
+
+  name              = "${var.name}"
+  security_group_id = "${module.cluster.security_group_id}"
+  vpc_id            = "${module.network.vpc_id}"
+}
+
 # then create an ECS service within the cluster (that can use the database)
 module "backend" {
   source = "modules/backend"

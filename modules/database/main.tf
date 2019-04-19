@@ -82,4 +82,8 @@ resource "aws_db_instance" "postgres" {
   tags = {
     Name = "${var.name}.postgres"
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
