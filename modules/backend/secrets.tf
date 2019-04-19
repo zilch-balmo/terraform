@@ -1,5 +1,5 @@
 resource "aws_secretsmanager_secret" "backend" {
-  name = "backend"
+  name = "secrets//backend"
 }
 
 resource "random_string" "backend_postgres_password" {
@@ -8,8 +8,10 @@ resource "random_string" "backend_postgres_password" {
 
 locals {
   secrets = {
-    postgres = {
-      host = "${random_string.backend_postgres_password.result}"
+    config = {
+      postgres = {
+        password = "${random_string.backend_postgres_password.result}"
+      }
     }
   }
 }

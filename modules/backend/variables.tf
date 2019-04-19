@@ -1,5 +1,6 @@
 variable "alb_id" {}
 variable "cluster_id" {}
+variable "database_host" {}
 variable "execution_role_arn" {}
 
 variable "fargate_cpu" {

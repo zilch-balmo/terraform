@@ -60,6 +60,7 @@ module "backend" {
 
   alb_id             = "${module.cluster.alb_id}"
   cluster_id         = "${module.cluster.cluster_id}"
+  database_host      = "${module.database.host}"
   execution_role_arn = "${module.cluster.execution_role_arn}"
   name               = "${var.name}"
   security_group_id  = "${module.cluster.security_group_id}"

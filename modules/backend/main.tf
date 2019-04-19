@@ -21,13 +21,18 @@ resource "aws_ecr_repository" "backend" {
 
 # ECS
 
+# XXX add:
+# - MICROCOSM_ENVIRONMENT=
+# - MICROCOSM_CONFIG_VERSION=AWSCURRENT
+# - BACKEND__POSTGRES__HOST=
 data "template_file" "container_definitions" {
   template = "${file("${path.module}/task-definitions/backend.json")}"
 
   vars = {
-    cpu       = "${var.fargate_cpu}"
-    memory    = "${var.fargate_memory}"
-    log_group = "${aws_cloudwatch_log_group.backend.name}"
+    cpu           = "${var.fargate_cpu}"
+    database_host = "${var.database_host}"
+    memory        = "${var.fargate_memory}"
+    log_group     = "${aws_cloudwatch_log_group.backend.name}"
   }
 }
 
