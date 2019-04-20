@@ -15,5 +15,8 @@ variable "fargate_memory" {
 
 variable "name" {}
 variable "security_group_id" {}
+variable "user_pool_arn" {}
+variable "user_pool_client_id" {}
+variable "user_pool_domain" {}
 variable "vpc_id" {}
 variable "zone_id" {}

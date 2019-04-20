@@ -34,6 +34,16 @@ resource "aws_alb_listener" "backend_https" {
   certificate_arn   = "${aws_acm_certificate.backend.arn}"
 
   default_action {
+    type = "authenticate-cognito"
+
+    authenticate_cognito {
+      user_pool_arn       = "${var.user_pool_arn}"
+      user_pool_client_id = "${var.user_pool_client_id}"
+      user_pool_domain    = "${var.user_pool_domain}"
+    }
+  }
+
+  default_action {
     target_group_arn = "${aws_alb_target_group.backend.id}"
     type             = "forward"
   }
