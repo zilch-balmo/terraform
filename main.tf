@@ -4,6 +4,13 @@ provider "aws" {
   allowed_account_ids = ["534764804984"]
 }
 
+provider "aws" {
+  profile             = "zilch"
+  region              = "us-east-1"
+  allowed_account_ids = ["534764804984"]
+  alias               = "east"
+}
+
 terraform {
   backend "s3" {
     bucket  = "terraform.zilch.me"
@@ -22,6 +29,14 @@ module "network" {
   source = "modules/network"
 
   name = "${var.name}"
+}
+
+# and a user pool for authentication
+module "auth" {
+  source = "modules/auth"
+
+  name    = "${var.name}"
+  zone_id = "${aws_route53_zone.root.zone_id}"
 }
 
 # then create an ECS Fargate cluster within the network
