@@ -1,11 +1,20 @@
-resource "aws_alb_target_group" "backend" {
-  name        = "backend"
+resource "aws_alb_target_group" "backend_http_80" {
+  name        = "backendhttp80"
   port        = 80
   protocol    = "HTTP"
   vpc_id      = "${var.vpc_id}"
   target_type = "ip"
 
-  tags = {
+  health_check {
+    healthy_threshold   = 2
+    interval            = 5
+    matcher             = "200"
+    path                = "/"
+    timeout             = 2
+    unhealthy_threshold = 2
+  }
+
+  tags {
     Name = "${var.name}.backend"
   }
 }
@@ -44,7 +53,7 @@ resource "aws_alb_listener" "backend_https" {
   }
 
   default_action {
-    target_group_arn = "${aws_alb_target_group.backend.id}"
+    target_group_arn = "${aws_alb_target_group.backend_http_80.id}"
     type             = "forward"
   }
 }

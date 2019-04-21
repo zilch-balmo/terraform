@@ -13,6 +13,7 @@ data "aws_iam_policy_document" "ci" {
       "ecs:DescribeTaskDefinition",
       "ecs:UpdateService",
       "ecs:RegisterTaskDefinition",
+      "iam:PassRole",
     ]
 
     resources = [

@@ -11,8 +11,9 @@ We are now using Cognito for auth to https://backend.zilch.com
 
 Your username is {username} and temporary password is {####}.
 EOF
+
       email_subject = "[zilch]: Your temporary password"
-      sms_message = "Your username is {username} and temporary password is {####}. "
+      sms_message   = "Your username is {username} and temporary password is {####}. "
     }
   }
 
@@ -25,7 +26,7 @@ EOF
   }
 
   sms_authentication_message = "Your authentication code is {####}. "
-  sms_verification_message = "Your verification code is {####}. "
+  sms_verification_message   = "Your verification code is {####}. "
 
   tags {
     Name = "${var.name}"

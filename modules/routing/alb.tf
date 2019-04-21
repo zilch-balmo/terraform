@@ -4,13 +4,13 @@
 data "aws_subnet_ids" "public" {
   vpc_id = "${var.vpc_id}"
 
-  tags = {
+  tags {
     Name = "${var.name}.public"
   }
 }
 
 resource "aws_security_group" "alb" {
-  name   = "${var.name}.${var.tier}.alb"
+  name   = "${var.name}.alb"
   vpc_id = "${var.vpc_id}"
 
   ingress {
@@ -34,8 +34,8 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "${var.name}.${var.tier}.alb"
+  tags {
+    Name = "${var.name}.alb"
   }
 
   lifecycle {
@@ -44,7 +44,7 @@ resource "aws_security_group" "alb" {
 }
 
 resource "aws_alb" "alb" {
-  name = "${var.name}-${var.tier}"
+  name = "${var.name}"
 
   subnets = [
     "${data.aws_subnet_ids.public.ids}",
@@ -54,7 +54,7 @@ resource "aws_alb" "alb" {
     "${aws_security_group.alb.id}",
   ]
 
-  tags = {
-    Name = "${var.name}.${var.tier}"
+  tags {
+    Name = "${var.name}"
   }
 }

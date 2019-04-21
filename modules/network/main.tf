@@ -9,7 +9,7 @@ data "aws_availability_zones" "available" {}
 resource "aws_vpc" "vpc" {
   cidr_block = "${var.cidr_block}"
 
-  tags = {
+  tags {
     Name = "${var.name}"
   }
 }
@@ -20,7 +20,7 @@ resource "aws_subnet" "private" {
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
   vpc_id            = "${aws_vpc.vpc.id}"
 
-  tags = {
+  tags {
     Name = "${var.name}.private"
   }
 }
@@ -32,7 +32,7 @@ resource "aws_subnet" "public" {
   vpc_id                  = "${aws_vpc.vpc.id}"
   map_public_ip_on_launch = true
 
-  tags = {
+  tags {
     Name = "${var.name}.public"
   }
 }
@@ -40,7 +40,7 @@ resource "aws_subnet" "public" {
 resource "aws_internet_gateway" "public" {
   vpc_id = "${aws_vpc.vpc.id}"
 
-  tags = {
+  tags {
     Name = "${var.name}"
   }
 }
@@ -65,7 +65,7 @@ resource "aws_nat_gateway" "nat" {
   subnet_id     = "${element(aws_subnet.public.*.id, count.index)}"
   allocation_id = "${element(aws_eip.nat.*.id, count.index)}"
 
-  tags = {
+  tags {
     Name = "${var.name}"
   }
 }
@@ -79,7 +79,7 @@ resource "aws_route_table" "private" {
     nat_gateway_id = "${element(aws_nat_gateway.nat.*.id, count.index)}"
   }
 
-  tags = {
+  tags {
     Name = "${var.name}"
   }
 }

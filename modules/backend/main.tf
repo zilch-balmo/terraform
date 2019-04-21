@@ -4,7 +4,7 @@
 data "aws_subnet_ids" "private" {
   vpc_id = "${var.vpc_id}"
 
-  tags = {
+  tags {
     Name = "${var.name}.private"
   }
 }
@@ -21,16 +21,18 @@ resource "aws_ecr_repository" "backend" {
 
 # ECS
 
-# XXX add:
-# - MICROCOSM_ENVIRONMENT=
-# - MICROCOSM_CONFIG_VERSION=AWSCURRENT
-# - BACKEND__POSTGRES__HOST=
+# XXX healthCheck
+/* The backend image serves the WSGI application with gunicorn, which recommends running
+ * behing nginx. However, there's enough evidence online of people running gunicorn directly
+ * behind an ALB, without nginx (using gevent) to suggest this complication can be avoided for now.
+ */
 data "template_file" "container_definitions" {
   template = "${file("${path.module}/task-definitions/backend.json")}"
 
   vars = {
     cpu           = "${var.fargate_cpu}"
     database_host = "${var.database_host}"
+    image         = "${aws_ecr_repository.backend.repository_url}:latest"
     memory        = "${var.fargate_memory}"
     log_group     = "${aws_cloudwatch_log_group.backend.name}"
   }
@@ -70,14 +72,17 @@ resource "aws_ecs_service" "backend" {
   }
 
   load_balancer {
-    target_group_arn = "${aws_alb_target_group.backend.arn}"
+    target_group_arn = "${aws_alb_target_group.backend_http_80.arn}"
     container_name   = "backend"
     container_port   = 80
   }
 
   lifecycle {
+    create_before_destroy = true
+
     ignore_changes = [
       "desired_count",
+      "task_definition",
     ]
   }
 }

@@ -9,7 +9,7 @@ data "aws_secretsmanager_secret_version" "rds_master_password" {
 data "aws_subnet_ids" "private" {
   vpc_id = "${var.vpc_id}"
 
-  tags = {
+  tags {
     Name = "${var.name}.private"
   }
 }
@@ -35,7 +35,7 @@ resource "aws_security_group" "postgres" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
+  tags {
     Name = "${var.name}.postgres"
   }
 
@@ -51,7 +51,7 @@ resource "aws_db_subnet_group" "postgres" {
     "${data.aws_subnet_ids.private.ids}",
   ]
 
-  tags = {
+  tags {
     Name = "${var.name}.postgres"
   }
 
@@ -79,7 +79,7 @@ resource "aws_db_instance" "postgres" {
     "${aws_security_group.postgres.id}",
   ]
 
-  tags = {
+  tags {
     Name = "${var.name}.postgres"
   }
 

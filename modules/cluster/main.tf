@@ -12,7 +12,7 @@ resource "aws_security_group" "ingress" {
     to_port   = 80
 
     security_groups = [
-      "${aws_security_group.alb.id}",
+      "${var.alb_security_group_id}",
     ]
   }
 
@@ -23,7 +23,7 @@ resource "aws_security_group" "ingress" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
+  tags {
     Name = "${var.name}.${var.tier}.ingress"
   }
 

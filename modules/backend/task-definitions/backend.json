@@ -1,8 +1,22 @@
 [
     {
 	"cpu": ${cpu},
+	"environment": [
+	    {
+		"name": "BACKEND__POSTGRES__HOST",
+		"value": "${database_host}"
+	    },
+	    {
+		"name": "MICROCOSM_ENVIRONMENT",
+		"value": ""
+	    },
+	    {
+		"name": "MICRCOCOSM_CONFIG_VERSION",
+		"value": "AWSCURRENT"
+	    }
+	],
 	"essential": true,
-	"image": "nginx:latest",
+	"image": "${image}",
 	"memory": ${memory},
 	"name": "backend",
 	"portMappings": [

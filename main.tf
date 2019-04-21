@@ -31,21 +31,30 @@ module "network" {
   name = "${var.name}"
 }
 
+# and routing
+module "routing" {
+  source = "modules/routing"
+
+  name   = "${var.name}"
+  vpc_id = "${module.network.vpc_id}"
+}
+
 # and a user pool for authentication
 module "auth" {
   source = "modules/auth"
 
   name    = "${var.name}"
-  zone_id = "${aws_route53_zone.root.zone_id}"
+  zone_id = "${module.routing.zone_id}"
 }
 
 # then create an ECS Fargate cluster within the network
 module "cluster" {
   source = "modules/cluster"
 
-  name   = "${var.name}"
-  tier   = "backend"
-  vpc_id = "${module.network.vpc_id}"
+  alb_security_group_id = "${module.routing.security_group_id}"
+  name                  = "${var.name}"
+  tier                  = "backend"
+  vpc_id                = "${module.network.vpc_id}"
 }
 
 # then create an RDS database that's accessible from the cluster security group
@@ -73,9 +82,9 @@ module "database-admin" {
 module "backend" {
   source = "modules/backend"
 
-  alb_id              = "${module.cluster.alb_id}"
-  alb_dns_name        = "${module.cluster.alb_dns_name}"
-  alb_zone_id         = "${module.cluster.alb_zone_id}"
+  alb_id              = "${module.routing.alb_id}"
+  alb_dns_name        = "${module.routing.alb_dns_name}"
+  alb_zone_id         = "${module.routing.alb_zone_id}"
   cluster_id          = "${module.cluster.cluster_id}"
   database_host       = "${module.database.host}"
   execution_role_arn  = "${module.cluster.execution_role_arn}"
@@ -85,5 +94,5 @@ module "backend" {
   user_pool_client_id = "${module.auth.user_pool_client_id}"
   user_pool_domain    = "${module.auth.user_pool_domain}"
   vpc_id              = "${module.network.vpc_id}"
-  zone_id             = "${aws_route53_zone.root.zone_id}"
+  zone_id             = "${module.routing.zone_id}"
 }
