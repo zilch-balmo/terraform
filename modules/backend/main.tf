@@ -21,11 +21,6 @@ resource "aws_ecr_repository" "backend" {
 
 # ECS
 
-# XXX healthCheck
-/* The backend image serves the WSGI application with gunicorn, which recommends running
- * behing nginx. However, there's enough evidence online of people running gunicorn directly
- * behind an ALB, without nginx (using gevent) to suggest this complication can be avoided for now.
- */
 data "template_file" "container_definitions" {
   template = "${file("${path.module}/task-definitions/backend.json")}"
 
