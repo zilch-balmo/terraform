@@ -1,4 +1,4 @@
-resource "aws_route53_record" "backencd" {
+resource "aws_route53_record" "backend" {
   zone_id = "${var.zone_id}"
   name    = "backend.zilch.me"
   type    = "A"
