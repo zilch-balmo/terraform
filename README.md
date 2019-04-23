@@ -22,3 +22,12 @@ Terraform setup for `zilch.me`.
         [zilch]
         aws_access_key_id = <redacted>
         aws_secret_access_key = <redacted>
+
+ 5. Setup the `awscli`:
+
+        mkvirtualenv aws
+        pip install awscli
+        deactivate
+        mkdir -p ~/bin
+        ln -s $WORKON_HOME/bin/aws ~/bin
+        export PATH=$PATH:~/bin
