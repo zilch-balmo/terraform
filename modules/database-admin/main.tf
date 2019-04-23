@@ -34,7 +34,7 @@ resource "aws_lambda_function" "database_admin" {
 
   lifecycle {
     ignore_changes = [
-      "last_modified"
+      "last_modified",
     ]
   }
 }

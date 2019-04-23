@@ -19,7 +19,6 @@ resource "aws_s3_bucket" "terraform" {
  */
 resource "aws_secretsmanager_secret" "rds_master_password" {
   name = "rds_master_password"
-
 }
 
 resource "null_resource" "rds_master_password" {

@@ -25,11 +25,12 @@ data "template_file" "container_definitions" {
   template = "${file("${path.module}/task-definitions/backend.json")}"
 
   vars = {
-    cpu           = "${var.fargate_cpu}"
-    database_host = "${var.database_host}"
-    image         = "${aws_ecr_repository.backend.repository_url}:latest"
-    memory        = "${var.fargate_memory}"
-    log_group     = "${aws_cloudwatch_log_group.backend.name}"
+    cpu                      = "${var.fargate_cpu}"
+    database_host            = "${var.database_host}"
+    image                    = "${aws_ecr_repository.backend.repository_url}:latest"
+    memory                   = "${var.fargate_memory}"
+    log_group                = "${aws_cloudwatch_log_group.backend.name}"
+    rds_backend_password_arn = "${aws_secretsmanager_secret.rds_backend_password.arn}"
   }
 }
 

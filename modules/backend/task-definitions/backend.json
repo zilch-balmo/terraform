@@ -5,14 +5,6 @@
 	    {
 		"name": "BACKEND__POSTGRES__HOST",
 		"value": "${database_host}"
-	    },
-	    {
-		"name": "MICROCOSM_ENVIRONMENT",
-		"value": ""
-	    },
-	    {
-		"name": "MICRCOCOSM_CONFIG_VERSION",
-		"value": "AWSCURRENT"
 	    }
 	],
 	"essential": true,
@@ -32,6 +24,12 @@
 		"awslogs-region": "us-west-2",
 		"awslogs-stream-prefix": "ecs"
 	    }
-	}
+	},
+	"secrets": [
+	    {
+		"name": "BACKEND__POSTGRES__PASSWORD",
+		"valueFrom": "${rds_backend_password_arn}"
+	    }
+	]
     }
 ]
