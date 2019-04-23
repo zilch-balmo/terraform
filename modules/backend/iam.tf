@@ -35,7 +35,7 @@ data "aws_iam_policy_document" "backend" {
     ]
 
     resources = [
-      "${aws_secretsmanager_secret.backend.arn}",
+      "${aws_secretsmanager_secret.rds_backend_password.arn}",
     ]
   }
 }

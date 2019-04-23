@@ -1,22 +1,13 @@
-resource "aws_secretsmanager_secret" "backend" {
-  name = "secrets//backend"
+resource "aws_secretsmanager_secret" "rds_backend_password" {
+  name = "rds_backend_password"
 }
 
-resource "random_string" "backend_postgres_password" {
-  length = 32
-}
+resource "null_resource" "rds_backend_password" {
+  depends_on = [
+    "aws_secretsmanager_secret.rds_backend_password",
+  ]
 
-locals {
-  secrets = {
-    config = {
-      postgres = {
-        password = "${random_string.backend_postgres_password.result}"
-      }
-    }
+  provisioner "local-exec" {
+    command = "aws --profile zilch secretsmanager put-secret-value --secret-id rds_backend_password --secret-string $(openssl rand -base64 32)"
   }
-}
-
-resource "aws_secretsmanager_secret_version" "backend" {
-  secret_id     = "${aws_secretsmanager_secret.backend.id}"
-  secret_string = "${jsonencode(local.secrets)}"
 }

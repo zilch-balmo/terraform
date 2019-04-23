@@ -111,7 +111,6 @@ resource "aws_instance" "nat" {
 
   ami                    = "${data.aws_ami.ami.id}"
   instance_type          = "t2.nano"
-  key_name               = "jesse"
   source_dest_check      = false
   iam_instance_profile   = "${aws_iam_instance_profile.nat.id}"
   subnet_id              = "${element(aws_subnet.public.*.id, count.index)}"
@@ -151,7 +150,7 @@ resource "aws_route_table" "private" {
   route {
     cidr_block     = "0.0.0.0/0"
     instance_id = "${element(aws_instance.nat.*.id, count.index)}"
-    // nat_gateway_id = "${element(aws_nat_gateway.nat.*.id, count.index)}"
+    /* nat_gateway_id = "${element(aws_nat_gateway.nat.*.id, count.index)}" */
   }
 
   tags {

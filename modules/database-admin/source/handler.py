@@ -1,5 +1,3 @@
-from json import loads
-
 from boto3 import Session
 from psycopg2 import connect, ProgrammingError
 
@@ -30,10 +28,9 @@ def find_service_password(session, service):
     secretsmanager = session.client("secretsmanager")
 
     response = secretsmanager.get_secret_value(
-        SecretId=f"secrets//{service}",
+        SecretId=f"rds_{service}_password",
     )
-    data = loads(response["SecretString"])
-    return data["config"]["postgres"]["password"]
+    return response["SecretString"]
 
 
 def list_databases(**kwargs):
@@ -99,6 +96,7 @@ def drop_database(service, **kwargs):
             # turn off transactions; DROP DATABASE cannot run within a transaction
             connection.autocommit = True
             cursor.execute(f"DROP DATABASE IF EXISTS {service}_db;")
+            cursor.execute(f"DROP OWNED BY {service}");
             cursor.execute(f"DROP ROLE IF EXISTS {service};")
 
 
