@@ -27,7 +27,7 @@
 	},
 	"secrets": [
 	    {
-		"name": "BACKEND__POSTGRES__PASSWORD",
+		"name": "_BACKEND__POSTGRES__PASSWORD",
 		"valueFrom": "${rds_backend_password_arn}"
 	    }
 	]

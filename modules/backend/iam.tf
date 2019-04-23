@@ -29,13 +29,11 @@ data "aws_iam_policy_document" "backend" {
     effect = "Allow"
 
     actions = [
-      "secretsmanager:Describe*",
-      "secretsmanager:Get*",
-      "secretsmanager:List*",
+      "secretsmanager:GetSecretValue",
     ]
 
     resources = [
-      "${aws_secretsmanager_secret.rds_backend_password.arn}",
+      "arn:aws:secretsmanager:us-west-2:534764804984:secret:rds_*_password-??????"
     ]
   }
 }
