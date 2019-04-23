@@ -9,7 +9,7 @@ resource "aws_alb_target_group" "backend_http_80" {
     healthy_threshold   = 2
     interval            = 5
     matcher             = "200"
-    path                = "/"
+    path                = "/api/health"
     timeout             = 2
     unhealthy_threshold = 2
   }
