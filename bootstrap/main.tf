@@ -19,13 +19,15 @@ resource "aws_s3_bucket" "terraform" {
  */
 resource "aws_secretsmanager_secret" "rds_master_password" {
   name = "rds_master_password"
+
 }
 
-resource "random_string" "rds_master_password" {
-  length = 32
-}
+resource "null_resource" "rds_master_password" {
+  depends_on = [
+    "aws_secretsmanager_secret.rds_master_password",
+  ]
 
-resource "aws_secretsmanager_secret_version" "rds_master_password" {
-  secret_id     = "${aws_secretsmanager_secret.rds_master_password.id}"
-  secret_string = "${random_string.rds_master_password.result}"
+  provisioner "local-exec" {
+    command = "aws --profile zilch secretsmanager put-secret-value --secret-id rds_master_password --secret-string $(openssl rand -base64 32)"
+  }
 }
