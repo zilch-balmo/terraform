@@ -46,6 +46,16 @@ def list_databases(**kwargs):
             ]
 
 
+def list_tables(**kwargs):
+    with connect(**kwargs) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
+            return [
+                name
+                for name, *_ in cursor.fetchall()
+            ]
+
+
 def create_database(service, service_password, **kwargs):
     with connect(**kwargs) as connection:
         with connection.cursor() as cursor:
@@ -73,6 +83,16 @@ def create_database(service, service_password, **kwargs):
                     raise
 
 
+def create_alembic_table(**kwargs):
+    with connect(**kwargs) as connection:
+        with connection.cursor() as cursor:
+            connection.autocommit = True
+            try:
+                cursor.execute("CREATE TABLE IF NOT EXISTS alembic_version (version_num character varying(32) not null, constraint alembic_version_pkc primary key(version_num));")
+            except ProgrammingError as error:
+                print(error.pgcode)
+
+
 def drop_database(service, **kwargs):
     with connect(**kwargs) as connection:
         with connection.cursor() as cursor:
@@ -81,6 +101,11 @@ def drop_database(service, **kwargs):
             cursor.execute(f"DROP DATABASE IF EXISTS {service}_db;")
             cursor.execute(f"DROP ROLE IF EXISTS {service};")
 
+
+def get_service_info(session, event):
+    service = event["service"]
+    service_password = find_service_password(session, service)
+    return service, service_password
 
 
 def main(event, context):
@@ -94,28 +119,32 @@ def main(event, context):
     password = find_rds_master_password(session)
 
     kwargs = dict(
-        dbname="postgres",
         user="postgres",
         password=password,
-        host=host,
     )
 
-    action = event.get("action", "list")
+    action = event.get("action", "list_databases")
 
     if action == "create":
         # create
-        service = event["service"]
-        service_password = find_service_password(session, service)
-        create_database(service, service_password, **kwargs)
+        service, service_password = get_service_info(session, event)
+        create_database(service, service_password, dbname="postgres", host=host, **kwargs)
+        create_alembic_table(user=service, password=service_password, dbname=f"{service}_db", host=host)
         return dict(service=service)
 
-    if action == "drop":
+    elif action == "list_tables":
+        # list_tables
+        service, service_password = get_service_info(session, event)
+        items = list_tables(user=service, password=service_password, dbname=f"{service}_db", host=host)
+        return dict(items=items)
+
+    elif action == "drop":
         # drop
         service = event["service"]
-        drop_database(service, **kwargs)
+        drop_database(service, dbname="postgres", host=host, **kwargs)
         return dict(service=service)
 
     else:
-        # list
-        items = list_databases(**kwargs)
+        # list_databases
+        items = list_databases(dbname="postgres", host=host, **kwargs)
         return dict(items=items)

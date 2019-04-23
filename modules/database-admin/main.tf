@@ -13,7 +13,7 @@ data "archive_file" "database_admin" {
 }
 
 resource "aws_lambda_function" "database_admin" {
-  filename         = "${data.archive_file.database_admin.output_path}"
+  filename         = "${substr(data.archive_file.database_admin.output_path, length(path.cwd) + 1, -1)}"
   function_name    = "database_admin"
   handler          = "handler.main"
   memory_size      = 128
@@ -29,6 +29,12 @@ resource "aws_lambda_function" "database_admin" {
 
     security_group_ids = [
       "${var.security_group_id}",
+    ]
+  }
+
+  lifecycle {
+    ignore_changes = [
+      "last_modified"
     ]
   }
 }
