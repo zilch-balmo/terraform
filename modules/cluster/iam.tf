@@ -24,7 +24,7 @@ resource "aws_iam_role_policy_attachment" "ecs" {
 }
 
 resource "aws_iam_policy" "secrets" {
-  name = "${var.name}.secrets.ecs"
+  name   = "${var.name}.secrets.ecs"
   policy = "${data.aws_iam_policy_document.secrets.json}"
 }
 
@@ -44,7 +44,7 @@ data "aws_iam_policy_document" "secrets" {
     ]
 
     resources = [
-      "*"
+      "*",
     ]
   }
 }

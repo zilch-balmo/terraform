@@ -33,7 +33,7 @@ data "aws_iam_policy_document" "backend" {
     ]
 
     resources = [
-      "arn:aws:secretsmanager:us-west-2:534764804984:secret:rds_*_password-??????"
+      "arn:aws:secretsmanager:us-west-2:534764804984:secret:rds_*_password-??????",
     ]
   }
 }
