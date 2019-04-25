@@ -33,7 +33,38 @@ EOF
   }
 }
 
-resource "aws_cognito_user_pool_client" "client" {
+resource "aws_cognito_user_pool_client" "app" {
+  allowed_oauth_flows_user_pool_client = true
+
+  allowed_oauth_flows = [
+    "code",
+    "implicit",
+  ]
+
+  allowed_oauth_scopes = [
+    "aws.cognito.signin.user.admin",
+    "email",
+    "openid",
+    "phone",
+    "profile",
+  ]
+
+  callback_urls = [
+    "https://app.zilch.me/oauth2/idpresponse",
+  ]
+
+  logout_urls = [
+    "https://app.zilch.me",
+  ]
+
+  # NB: JavaScript application are not compatible with clients that use a secret
+  generate_secret              = false
+  name                         = "${var.name}.app"
+  supported_identity_providers = ["COGNITO"]
+  user_pool_id                 = "${aws_cognito_user_pool.pool.id}"
+}
+
+resource "aws_cognito_user_pool_client" "backend" {
   allowed_oauth_flows_user_pool_client = true
 
   allowed_oauth_flows = [
@@ -53,12 +84,10 @@ resource "aws_cognito_user_pool_client" "client" {
     "https://backend.zilch.me/oauth2/idpresponse",
   ]
 
-  logout_urls = [
-    "https://backend.zilch.me",
-  ]
+  logout_urls = []
 
   generate_secret              = true
-  name                         = "${var.name}"
+  name                         = "${var.name}.backend"
   supported_identity_providers = ["COGNITO"]
   user_pool_id                 = "${aws_cognito_user_pool.pool.id}"
 }

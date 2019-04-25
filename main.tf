@@ -100,7 +100,7 @@ module "backend" {
   name                = "${var.name}"
   security_group_id   = "${module.cluster.security_group_id}"
   user_pool_arn       = "${module.auth.user_pool_arn}"
-  user_pool_client_id = "${module.auth.user_pool_client_id}"
+  user_pool_client_id = "${module.auth.user_pool_backend_client_id}"
   user_pool_domain    = "${module.auth.user_pool_domain}"
   vpc_id              = "${module.network.vpc_id}"
   zone_id             = "${module.routing.zone_id}"
