@@ -82,8 +82,9 @@ module "database-admin" {
 module "app" {
   source = "modules/app"
 
-  name    = "${var.name}"
-  zone_id = "${module.routing.zone_id}"
+  ci_user_arn = "${module.ci.user_arn}"
+  name        = "${var.name}"
+  zone_id     = "${module.routing.zone_id}"
 }
 
 # then create an ECS service within the cluster (that can use the database)

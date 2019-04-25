@@ -27,6 +27,19 @@ data "aws_iam_policy_document" "app" {
       identifiers = ["${aws_cloudfront_origin_access_identity.app.iam_arn}"]
     }
   }
+
+  statement {
+    actions   = ["s3:*"]
+    resources = [
+      "${aws_s3_bucket.app.arn}",
+      "${aws_s3_bucket.app.arn}/*",
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["${var.ci_user_arn}"]
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "app" {

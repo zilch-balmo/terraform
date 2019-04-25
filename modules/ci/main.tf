@@ -20,6 +20,16 @@ data "aws_iam_policy_document" "ci" {
       "*",
     ]
   }
+
+  statement {
+    actions = [
+      "s3:*",
+    ]
+
+    resources = [
+      "arn:aws:s3:::app.zilch.me",
+    ]
+  }
 }
 
 resource "aws_iam_group" "ci" {
