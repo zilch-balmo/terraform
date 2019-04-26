@@ -1,3 +1,4 @@
+/*
 resource "aws_security_group" "alb" {
   name   = "${var.name}.alb"
   vpc_id = "${var.vpc_id}"
@@ -40,3 +41,4 @@ resource "aws_security_group_rule" "alb_egress_all" {
   protocol    = "-1"
   cidr_blocks = ["0.0.0.0/0"]
 }
+*/

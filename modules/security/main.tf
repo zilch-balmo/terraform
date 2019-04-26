@@ -14,6 +14,7 @@ data "aws_subnet_ids" "public" {
   }
 }
 
+/*
 resource "aws_lb" "alb" {
   name = "${var.name}"
 
@@ -29,6 +30,7 @@ resource "aws_lb" "alb" {
     Name = "${var.name}"
   }
 }
+*/
 
 resource "aws_lb" "api" {
   name                             = "${var.name}api"

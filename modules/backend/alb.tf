@@ -1,3 +1,4 @@
+/*
 data "aws_lb" "alb" {
   name = "${var.name}"
 }
@@ -61,3 +62,4 @@ resource "aws_lb_listener" "backend_https" {
     type             = "forward"
   }
 }
+*/

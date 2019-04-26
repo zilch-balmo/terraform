@@ -50,7 +50,7 @@ resource "aws_cognito_user_pool_client" "app" {
   ]
 
   callback_urls = [
-    "https://app.zilch.me/oauth2/idpresponse",
+    "https://app.zilch.me",
   ]
 
   logout_urls = [
@@ -64,6 +64,7 @@ resource "aws_cognito_user_pool_client" "app" {
   user_pool_id                 = "${aws_cognito_user_pool.pool.id}"
 }
 
+/*
 resource "aws_cognito_user_pool_client" "backend" {
   allowed_oauth_flows_user_pool_client = true
 
@@ -91,6 +92,7 @@ resource "aws_cognito_user_pool_client" "backend" {
   supported_identity_providers = ["COGNITO"]
   user_pool_id                 = "${aws_cognito_user_pool.pool.id}"
 }
+*/
 
 resource "aws_cognito_user_pool_domain" "main" {
   depends_on = [

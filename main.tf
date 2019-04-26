@@ -94,14 +94,14 @@ module "app" {
 module "backend" {
   source = "modules/backend"
 
-  alb_security_group_id     = "${module.security.alb_security_group_id}"
+  // alb_security_group_id     = "${module.security.alb_security_group_id}"
   backend_security_group_id = "${module.security.backend_security_group_id}"
   cluster_id                = "${module.cluster.cluster_id}"
   database_host             = "${module.database.host}"
   execution_role_arn        = "${module.cluster.execution_role_arn}"
   name                      = "${var.name}"
   user_pool_arn             = "${module.auth.user_pool_arn}"
-  user_pool_client_id       = "${module.auth.user_pool_backend_client_id}"
+  // user_pool_client_id       = "${module.auth.user_pool_backend_client_id}"
   user_pool_domain          = "${module.auth.user_pool_domain}"
   vpc_id                    = "${module.network.vpc_id}"
   zone_id                   = "${module.routing.zone_id}"
