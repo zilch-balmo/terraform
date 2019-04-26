@@ -9,12 +9,11 @@ resource "aws_route53_zone" "root" {
 resource "aws_s3_bucket" "root" {
   bucket = "zilch.me"
 
-  /* We cannot use an original access identity in the bucket policy at the same time
-       * as a CloudFront custom original policy. This means we either need a public bucket
-       * (which is fine -- it's empty) or some other bucket policy that uses a shared secret.
-       *
-       * See:  https://github.com/riboseinc/terraform-aws-s3-cloudfront-redirect
-       */
+  // We cannot use an original access identity in the bucket policy at the same time
+  // as a CloudFront custom original policy. This means we either need a public bucket
+  // (which is fine -- it's empty) or some other bucket policy that uses a shared secret.
+  //
+  // See:  https://github.com/riboseinc/terraform-aws-s3-cloudfront-redirect
   acl = "public-read"
 
   website {

@@ -29,7 +29,8 @@ data "aws_iam_policy_document" "app" {
   }
 
   statement {
-    actions   = ["s3:*"]
+    actions = ["s3:*"]
+
     resources = [
       "${aws_s3_bucket.app.arn}",
       "${aws_s3_bucket.app.arn}/*",

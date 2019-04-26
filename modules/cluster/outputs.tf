@@ -1,7 +1,3 @@
-output "security_group_id" {
-  value = "${aws_security_group.ingress.id}"
-}
-
 output "cluster_id" {
   value = "${aws_ecs_cluster.cluster.id}"
 }

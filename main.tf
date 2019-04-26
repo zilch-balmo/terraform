@@ -51,22 +51,25 @@ module "auth" {
 module "cluster" {
   source = "modules/cluster"
 
-  alb_security_group_id = "${module.routing.security_group_id}"
-  name                  = "${var.name}"
-  tier                  = "backend"
-  vpc_id                = "${module.network.vpc_id}"
+  name   = "${var.name}"
+  tier   = "backend"
+  vpc_id = "${module.network.vpc_id}"
+}
+
+module "security" {
+  source = "modules/security"
+
+  name   = "${var.name}"
+  vpc_id = "${module.network.vpc_id}"
 }
 
 # then create an RDS database that's accessible from the cluster security group
 module "database" {
   source = "modules/database"
 
-  name   = "${var.name}"
-  vpc_id = "${module.network.vpc_id}"
-
-  allowed_security_group_ids = [
-    "${module.cluster.security_group_id}",
-  ]
+  name              = "${var.name}"
+  security_group_id = "${module.security.database_security_group_id}"
+  vpc_id            = "${module.network.vpc_id}"
 }
 
 # enable database administration via a lambda function
@@ -74,7 +77,7 @@ module "database-admin" {
   source = "modules/database-admin"
 
   name              = "${var.name}"
-  security_group_id = "${module.cluster.security_group_id}"
+  security_group_id = "${module.security.backend_security_group_id}"
   vpc_id            = "${module.network.vpc_id}"
 }
 
@@ -91,17 +94,23 @@ module "app" {
 module "backend" {
   source = "modules/backend"
 
-  alb_id              = "${module.routing.alb_id}"
-  alb_dns_name        = "${module.routing.alb_dns_name}"
-  alb_zone_id         = "${module.routing.alb_zone_id}"
-  cluster_id          = "${module.cluster.cluster_id}"
-  database_host       = "${module.database.host}"
-  execution_role_arn  = "${module.cluster.execution_role_arn}"
-  name                = "${var.name}"
-  security_group_id   = "${module.cluster.security_group_id}"
-  user_pool_arn       = "${module.auth.user_pool_arn}"
-  user_pool_client_id = "${module.auth.user_pool_backend_client_id}"
-  user_pool_domain    = "${module.auth.user_pool_domain}"
-  vpc_id              = "${module.network.vpc_id}"
-  zone_id             = "${module.routing.zone_id}"
+  alb_security_group_id     = "${module.security.alb_security_group_id}"
+  backend_security_group_id = "${module.security.backend_security_group_id}"
+  cluster_id                = "${module.cluster.cluster_id}"
+  database_host             = "${module.database.host}"
+  execution_role_arn        = "${module.cluster.execution_role_arn}"
+  name                      = "${var.name}"
+  user_pool_arn             = "${module.auth.user_pool_arn}"
+  user_pool_client_id       = "${module.auth.user_pool_backend_client_id}"
+  user_pool_domain          = "${module.auth.user_pool_domain}"
+  vpc_id                    = "${module.network.vpc_id}"
+  zone_id                   = "${module.routing.zone_id}"
+}
+
+module "api" {
+  source = "modules/api"
+
+  name    = "${var.name}"
+  vpc_id  = "${module.network.vpc_id}"
+  zone_id = "${module.routing.zone_id}"
 }

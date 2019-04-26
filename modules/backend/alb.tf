@@ -1,4 +1,8 @@
-resource "aws_alb_target_group" "backend_http_80" {
+data "aws_lb" "alb" {
+  name = "${var.name}"
+}
+
+resource "aws_lb_target_group" "backend_http_80" {
   name        = "backendhttp80"
   port        = 80
   protocol    = "HTTP"
@@ -19,8 +23,8 @@ resource "aws_alb_target_group" "backend_http_80" {
   }
 }
 
-resource "aws_alb_listener" "backend_http" {
-  load_balancer_arn = "${var.alb_id}"
+resource "aws_lb_listener" "backend_http" {
+  load_balancer_arn = "${data.aws_lb.alb.id}"
   port              = "80"
   protocol          = "HTTP"
 
@@ -35,8 +39,8 @@ resource "aws_alb_listener" "backend_http" {
   }
 }
 
-resource "aws_alb_listener" "backend_https" {
-  load_balancer_arn = "${var.alb_id}"
+resource "aws_lb_listener" "backend_https" {
+  load_balancer_arn = "${data.aws_lb.alb.id}"
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
@@ -53,7 +57,7 @@ resource "aws_alb_listener" "backend_https" {
   }
 
   default_action {
-    target_group_arn = "${aws_alb_target_group.backend_http_80.id}"
+    target_group_arn = "${aws_lb_target_group.backend_http_80.id}"
     type             = "forward"
   }
 }

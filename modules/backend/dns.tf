@@ -4,8 +4,11 @@ resource "aws_route53_record" "backend" {
   type    = "A"
 
   alias {
-    name                   = "${var.alb_dns_name}"
-    zone_id                = "${var.alb_zone_id}"
+    name    = "${data.aws_lb.alb.dns_name}"
+    zone_id = "${data.aws_lb.alb.zone_id}"
+
+    // name                   = "${data.aws_lb.api.dns_name}"
+    // zone_id                = "${data.aws_lb.api.zone_id}"
     evaluate_target_health = true
   }
 }

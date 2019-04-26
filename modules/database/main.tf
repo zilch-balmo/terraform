@@ -14,36 +14,6 @@ data "aws_subnet_ids" "private" {
   }
 }
 
-resource "aws_security_group" "postgres" {
-  name   = "${var.name}.postgres"
-  vpc_id = "${var.vpc_id}"
-
-  ingress {
-    protocol  = "tcp"
-    from_port = 5432
-    to_port   = 5432
-
-    security_groups = [
-      "${var.allowed_security_group_ids}",
-    ]
-  }
-
-  egress {
-    protocol    = "-1"
-    from_port   = 0
-    to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags {
-    Name = "${var.name}.postgres"
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 resource "aws_db_subnet_group" "postgres" {
   name = "${var.name}.postgres"
 
@@ -76,7 +46,7 @@ resource "aws_db_instance" "postgres" {
   username = "postgres"
 
   vpc_security_group_ids = [
-    "${aws_security_group.postgres.id}",
+    "${var.security_group_id}",
   ]
 
   tags {

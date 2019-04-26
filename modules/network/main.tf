@@ -50,3 +50,16 @@ resource "aws_route" "internet_access" {
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = "${aws_internet_gateway.public.id}"
 }
+
+resource "aws_instance" "test" {
+  ami                    = "${data.aws_ami.ami.id}"
+  key_name               = "jesse"
+  instance_type          = "t2.nano"
+  source_dest_check      = false
+  subnet_id              = "${element(aws_subnet.public.*.id, count.index)}"
+  vpc_security_group_ids = ["${aws_security_group.nat.id}"]
+
+  tags {
+    Name = "${var.name}"
+  }
+}

@@ -47,19 +47,19 @@ resource "aws_ecs_task_definition" "backend" {
 
 resource "aws_ecs_service" "backend" {
   cluster         = "${var.cluster_id}"
-  desired_count   = 0
+  desired_count   = 1
   launch_type     = "FARGATE"
   name            = "backend"
   task_definition = "${aws_ecs_task_definition.backend.arn}"
 
   depends_on = [
-    "aws_alb_listener.backend_http",
-    "aws_alb_listener.backend_https",
+    "aws_lb_listener.backend_http",
+    "aws_lb_listener.backend_https",
   ]
 
   network_configuration {
     security_groups = [
-      "${var.security_group_id}",
+      "${var.backend_security_group_id}",
     ]
 
     subnets = [
@@ -67,8 +67,16 @@ resource "aws_ecs_service" "backend" {
     ]
   }
 
+  /*
   load_balancer {
-    target_group_arn = "${aws_alb_target_group.backend_http_80.arn}"
+    target_group_arn = "${aws_lb_target_group.backend_http_80.arn}"
+    container_name   = "backend"
+    container_port   = 80
+  }
+  */
+
+  load_balancer {
+    target_group_arn = "${aws_lb_target_group.api.arn}"
     container_name   = "backend"
     container_port   = 80
   }
