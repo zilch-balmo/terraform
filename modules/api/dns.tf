@@ -1,8 +1,3 @@
-resource "aws_api_gateway_domain_name" "api" {
-  certificate_arn = "${aws_acm_certificate_validation.cert.certificate_arn}"
-  domain_name     = "api.zilch.me"
-}
-
 resource "aws_route53_record" "api" {
   name    = "${aws_api_gateway_domain_name.api.domain_name}"
   type    = "A"

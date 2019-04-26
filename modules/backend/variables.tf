@@ -1,5 +1,6 @@
 // variable "alb_security_group_id" {}
 variable "backend_security_group_id" {}
+
 variable "cluster_id" {}
 variable "database_host" {}
 variable "execution_role_arn" {}
@@ -14,7 +15,9 @@ variable "fargate_memory" {
 
 variable "name" {}
 variable "user_pool_arn" {}
+
 // variable "user_pool_client_id" {}
 variable "user_pool_domain" {}
+
 variable "vpc_id" {}
 variable "zone_id" {}

@@ -52,10 +52,10 @@ resource "aws_ecs_service" "backend" {
   name            = "backend"
   task_definition = "${aws_ecs_task_definition.backend.arn}"
 
-  depends_on = [
-    // "aws_lb_listener.backend_http",
-    // "aws_lb_listener.backend_https",
-  ]
+  depends_on = []
+
+  // "aws_lb_listener.backend_http",
+  // "aws_lb_listener.backend_https",
 
   network_configuration {
     security_groups = [
@@ -80,7 +80,6 @@ resource "aws_ecs_service" "backend" {
     container_name   = "backend"
     container_port   = 80
   }
-
   lifecycle {
     create_before_destroy = true
 
