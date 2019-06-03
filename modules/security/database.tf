@@ -1,8 +1,10 @@
 resource "aws_security_group" "database" {
-  name   = "${var.name}.database"
-  vpc_id = "${var.vpc_id}"
+  provider = aws.west
 
-  tags {
+  name   = "${var.name}.database"
+  vpc_id = var.vpc_id
+
+  tags = {
     Name = "${var.name}.database"
   }
 
@@ -12,18 +14,22 @@ resource "aws_security_group" "database" {
 }
 
 resource "aws_security_group_rule" "database_ingress_postgres" {
-  security_group_id = "${aws_security_group.database.id}"
+  provider = aws.west
+
+  security_group_id = aws_security_group.database.id
 
   type      = "ingress"
   protocol  = "tcp"
   from_port = 5432
   to_port   = 5432
 
-  source_security_group_id = "${aws_security_group.backend.id}"
+  source_security_group_id = aws_security_group.backend.id
 }
 
 resource "aws_security_group_rule" "database_egress_all" {
-  security_group_id = "${aws_security_group.database.id}"
+  provider = aws.west
+
+  security_group_id = aws_security_group.database.id
 
   type        = "egress"
   from_port   = 0
@@ -31,3 +37,4 @@ resource "aws_security_group_rule" "database_egress_all" {
   protocol    = "-1"
   cidr_blocks = ["0.0.0.0/0"]
 }
+

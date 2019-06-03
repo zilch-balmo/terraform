@@ -1,4 +1,6 @@
 data "aws_iam_policy_document" "ci" {
+  provider = aws.west
+
   statement {
     actions = [
       "ecr:BatchGetImage",
@@ -33,27 +35,38 @@ data "aws_iam_policy_document" "ci" {
 }
 
 resource "aws_iam_group" "ci" {
+  provider = aws.west
+
   name = "ci"
 }
 
 resource "aws_iam_policy" "ci" {
+  provider = aws.west
+
   name   = "ci"
-  policy = "${data.aws_iam_policy_document.ci.json}"
+  policy = data.aws_iam_policy_document.ci.json
 }
 
 resource "aws_iam_group_policy_attachment" "ci" {
-  group      = "${aws_iam_group.ci.name}"
-  policy_arn = "${aws_iam_policy.ci.arn}"
+  provider = aws.west
+
+  group      = aws_iam_group.ci.name
+  policy_arn = aws_iam_policy.ci.arn
 }
 
 resource "aws_iam_user" "ci" {
+  provider = aws.west
+
   name = "ci"
 }
 
 resource "aws_iam_user_group_membership" "ci" {
-  user = "${aws_iam_user.ci.name}"
+  provider = aws.west
+
+  user = aws_iam_user.ci.name
 
   groups = [
-    "${aws_iam_group.ci.name}",
+    aws_iam_group.ci.name,
   ]
 }
+

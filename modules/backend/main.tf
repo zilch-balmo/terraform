@@ -2,9 +2,11 @@
  */
 
 data "aws_subnet_ids" "private" {
+  provider = "aws.west"
+
   vpc_id = "${var.vpc_id}"
 
-  tags {
+  tags = {
     Name = "${var.name}.private"
   }
 }
@@ -12,10 +14,12 @@ data "aws_subnet_ids" "private" {
 # ECR
 
 resource "aws_ecr_repository" "backend" {
+  provider = "aws.west"
+
   name = "backend"
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
@@ -35,6 +39,8 @@ data "template_file" "container_definitions" {
 }
 
 resource "aws_ecs_task_definition" "backend" {
+  provider = "aws.west"
+
   container_definitions    = "${data.template_file.container_definitions.rendered}"
   cpu                      = "${var.fargate_cpu}"
   execution_role_arn       = "${var.execution_role_arn}"
@@ -46,6 +52,8 @@ resource "aws_ecs_task_definition" "backend" {
 }
 
 resource "aws_ecs_service" "backend" {
+  provider = "aws.west"
+
   cluster         = "${var.cluster_id}"
   desired_count   = 1
   launch_type     = "FARGATE"
@@ -62,9 +70,7 @@ resource "aws_ecs_service" "backend" {
       "${var.backend_security_group_id}",
     ]
 
-    subnets = [
-      "${data.aws_subnet_ids.private.ids}",
-    ]
+    subnets = data.aws_subnet_ids.private.ids
   }
 
   /*

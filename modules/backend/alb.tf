@@ -1,9 +1,13 @@
 /*
 data "aws_lb" "alb" {
+  provider = "aws.west"
+
   name = "${var.name}"
 }
 
 resource "aws_lb_target_group" "backend_http_80" {
+  provider = "aws.west"
+
   name        = "backendhttp80"
   port        = 80
   protocol    = "HTTP"
@@ -19,12 +23,14 @@ resource "aws_lb_target_group" "backend_http_80" {
     unhealthy_threshold = 2
   }
 
-  tags {
+  tags = {
     Name = "${var.name}.backend"
   }
 }
 
 resource "aws_lb_listener" "backend_http" {
+  provider = "aws.west"
+
   load_balancer_arn = "${data.aws_lb.alb.id}"
   port              = "80"
   protocol          = "HTTP"
@@ -41,6 +47,8 @@ resource "aws_lb_listener" "backend_http" {
 }
 
 resource "aws_lb_listener" "backend_https" {
+  provider = "aws.west"
+
   load_balancer_arn = "${data.aws_lb.alb.id}"
   port              = "443"
   protocol          = "HTTPS"
@@ -63,4 +71,3 @@ resource "aws_lb_listener" "backend_https" {
   }
 }
 */
-

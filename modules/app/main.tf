@@ -3,28 +3,32 @@ locals {
 }
 
 resource "aws_s3_bucket" "app" {
+  provider = aws.west
+
   bucket = "app.zilch.me"
   acl    = "private"
 }
 
 data "aws_iam_policy_document" "app" {
+  provider = aws.west
+
   statement {
     actions   = ["s3:GetObject"]
     resources = ["${aws_s3_bucket.app.arn}/*"]
 
     principals {
       type        = "AWS"
-      identifiers = ["${aws_cloudfront_origin_access_identity.app.iam_arn}"]
+      identifiers = [aws_cloudfront_origin_access_identity.app.iam_arn]
     }
   }
 
   statement {
     actions   = ["s3:ListBucket"]
-    resources = ["${aws_s3_bucket.app.arn}"]
+    resources = [aws_s3_bucket.app.arn]
 
     principals {
       type        = "AWS"
-      identifiers = ["${aws_cloudfront_origin_access_identity.app.iam_arn}"]
+      identifiers = [aws_cloudfront_origin_access_identity.app.iam_arn]
     }
   }
 
@@ -32,31 +36,37 @@ data "aws_iam_policy_document" "app" {
     actions = ["s3:*"]
 
     resources = [
-      "${aws_s3_bucket.app.arn}",
+      aws_s3_bucket.app.arn,
       "${aws_s3_bucket.app.arn}/*",
     ]
 
     principals {
       type        = "AWS"
-      identifiers = ["${var.ci_user_arn}"]
+      identifiers = [var.ci_user_arn]
     }
   }
 }
 
 resource "aws_s3_bucket_policy" "app" {
-  bucket = "${aws_s3_bucket.app.id}"
-  policy = "${data.aws_iam_policy_document.app.json}"
+  provider = aws.west
+
+  bucket = aws_s3_bucket.app.id
+  policy = data.aws_iam_policy_document.app.json
 }
 
-resource "aws_cloudfront_origin_access_identity" "app" {}
+resource "aws_cloudfront_origin_access_identity" "app" {
+  provider = aws.west
+}
 
 resource "aws_cloudfront_distribution" "app" {
+  provider = aws.west
+
   origin {
-    domain_name = "${aws_s3_bucket.app.bucket_regional_domain_name}"
-    origin_id   = "${local.s3_origin_id}"
+    domain_name = aws_s3_bucket.app.bucket_regional_domain_name
+    origin_id   = local.s3_origin_id
 
     s3_origin_config {
-      origin_access_identity = "${aws_cloudfront_origin_access_identity.app.cloudfront_access_identity_path}"
+      origin_access_identity = aws_cloudfront_origin_access_identity.app.cloudfront_access_identity_path
     }
   }
 
@@ -71,7 +81,7 @@ resource "aws_cloudfront_distribution" "app" {
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "${local.s3_origin_id}"
+    target_origin_id = local.s3_origin_id
 
     forwarded_values {
       query_string = false
@@ -93,12 +103,13 @@ resource "aws_cloudfront_distribution" "app" {
     }
   }
 
-  tags {
-    Name = "${var.name}"
+  tags = {
+    Name = var.name
   }
 
   viewer_certificate {
-    acm_certificate_arn = "${aws_acm_certificate.app.arn}"
+    acm_certificate_arn = aws_acm_certificate.app.arn
     ssl_support_method  = "sni-only"
   }
 }
+

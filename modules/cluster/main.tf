@@ -1,3 +1,6 @@
 resource "aws_ecs_cluster" "cluster" {
-  name = "${var.name}"
+  provider = aws.west
+
+  name = var.name
 }
+

@@ -3,6 +3,8 @@
  * See: https://github.com/terraform-community-modules/tf_aws_nat/blob/master/main.tf
  */
 resource "aws_security_group" "nat" {
+  provider = "aws.west"
+
   name        = "nat"
   description = "Allow nat traffic"
   vpc_id      = "${aws_vpc.vpc.id}"
@@ -23,6 +25,8 @@ resource "aws_security_group" "nat" {
 }
 
 data "aws_iam_policy_document" "nat" {
+  provider = "aws.west"
+
   statement {
     effect = "Allow"
 
@@ -42,6 +46,8 @@ data "aws_iam_policy_document" "nat" {
 }
 
 data "aws_iam_policy_document" "assume_role" {
+  provider = "aws.west"
+
   statement {
     effect = "Allow"
 
@@ -56,26 +62,36 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
-data "aws_region" "current" {}
+data "aws_region" "current" {
+  provider = "aws.west"
+}
 
 resource "aws_iam_instance_profile" "nat" {
+  provider = "aws.west"
+
   name = "${var.name}.nat"
   role = "${aws_iam_role.nat.name}"
 }
 
 resource "aws_iam_role" "nat" {
+  provider = "aws.west"
+
   name               = "${var.name}.nat"
   path               = "/"
   assume_role_policy = "${data.aws_iam_policy_document.assume_role.json}"
 }
 
 resource "aws_iam_role_policy" "nat" {
+  provider = "aws.west"
+
   name   = "${var.name}.nat"
   role   = "${aws_iam_role.nat.id}"
   policy = "${data.aws_iam_policy_document.nat.json}"
 }
 
 data "aws_ami" "ami" {
+  provider = "aws.west"
+
   most_recent = true
 
   filter {
@@ -96,7 +112,7 @@ data "template_file" "user_data" {
 
   template = "${file("${path.module}/nat.conf.tmpl")}"
 
-  vars {
+  vars = {
     name              = "${var.name}"
     mysubnet          = "${element(aws_subnet.private.*.id, count.index)}"
     vpc_cidr          = "${aws_vpc.vpc.cidr_block}"
@@ -107,6 +123,8 @@ data "template_file" "user_data" {
 }
 
 resource "aws_instance" "nat" {
+  provider = "aws.west"
+
   count = "${local.min_az_count}"
 
   ami                    = "${data.aws_ami.ami.id}"
@@ -117,13 +135,15 @@ resource "aws_instance" "nat" {
   vpc_security_group_ids = ["${aws_security_group.nat.id}"]
   user_data              = "${element(data.template_file.user_data.*.rendered, count.index)}"
 
-  tags {
+  tags = {
     Name = "${var.name}.nat"
   }
 }
 
 /*
 resource "aws_eip" "nat" {
+  provider = "aws.west"
+
   count = "${local.min_az_count}"
   vpc   = true
 
@@ -133,17 +153,21 @@ resource "aws_eip" "nat" {
 }
 
 resource "aws_nat_gateway" "nat" {
+  provider = "aws.west"
+
   count         = "${local.min_az_count}"
   subnet_id     = "${element(aws_subnet.public.*.id, count.index)}"
   allocation_id = "${element(aws_eip.nat.*.id, count.index)}"
 
-  tags {
+  tags = {
     Name = "${var.name}"
   }
 }
 */
 
 resource "aws_route_table" "private" {
+  provider = "aws.west"
+
   count  = "${local.min_az_count}"
   vpc_id = "${aws_vpc.vpc.id}"
 
@@ -154,12 +178,14 @@ resource "aws_route_table" "private" {
     /* nat_gateway_id = "${element(aws_nat_gateway.nat.*.id, count.index)}" */
   }
 
-  tags {
+  tags = {
     Name = "${var.name}"
   }
 }
 
 resource "aws_route_table_association" "private" {
+  provider = "aws.west"
+
   count          = "${local.min_az_count}"
   subnet_id      = "${element(aws_subnet.private.*.id, count.index)}"
   route_table_id = "${element(aws_route_table.private.*.id, count.index)}"

@@ -1,21 +1,27 @@
 data "aws_subnet_ids" "private" {
-  vpc_id = "${var.vpc_id}"
+  provider = aws.west
 
-  tags {
+  vpc_id = var.vpc_id
+
+  tags = {
     Name = "${var.name}.private"
   }
 }
 
 data "aws_subnet_ids" "public" {
-  vpc_id = "${var.vpc_id}"
+  provider = aws.west
 
-  tags {
+  vpc_id = var.vpc_id
+
+  tags = {
     Name = "${var.name}.public"
   }
 }
 
 /*
 resource "aws_lb" "alb" {
+  provider = "aws.west"
+
   name = "${var.name}"
 
   subnets = [
@@ -33,17 +39,18 @@ resource "aws_lb" "alb" {
 */
 
 resource "aws_lb" "api" {
+  provider = aws.west
+
   name                             = "${var.name}api"
   load_balancer_type               = "network"
   enable_cross_zone_load_balancing = "true"
 
   internal = true
 
-  subnets = [
-    "${data.aws_subnet_ids.private.ids}",
-  ]
+  subnets = data.aws_subnet_ids.private.ids
 
-  tags {
-    Name = "${var.name}"
+  tags = {
+    Name = var.name
   }
 }
+

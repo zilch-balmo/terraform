@@ -1,22 +1,34 @@
 data "aws_network_interface" "nlb" {
-  count = "${length(data.aws_subnet_ids.private.ids)}"
+  provider = aws.west
 
-  filter = {
+  count = length(data.aws_subnet_ids.private.ids)
+
+  filter {
     name   = "description"
     values = ["ELB ${aws_lb.api.arn_suffix}"]
   }
 
-  filter = {
-    name   = "subnet-id"
-    values = ["${element(data.aws_subnet_ids.private.ids, count.index)}"]
+  filter {
+    name = "subnet-id"
+    # TF-UPGRADE-TODO: In Terraform v0.10 and earlier, it was sometimes necessary to
+    # force an interpolation expression to be interpreted as a list by wrapping it
+    # in an extra set of list brackets. That form was supported for compatibilty in
+    # v0.11, but is no longer supported in Terraform v0.12.
+    #
+    # If the expression in the following list itself returns a list, remove the
+    # brackets to avoid interpretation as a list of lists. If the expression
+    # returns a single list item then leave it as-is and remove this TODO comment.
+    values = [element(tolist(data.aws_subnet_ids.private.ids), count.index)]
   }
 }
 
 resource "aws_security_group" "backend" {
-  name   = "${var.name}.backend"
-  vpc_id = "${var.vpc_id}"
+  provider = aws.west
 
-  tags {
+  name   = "${var.name}.backend"
+  vpc_id = var.vpc_id
+
+  tags = {
     Name = "${var.name}.backend"
   }
 
@@ -26,7 +38,9 @@ resource "aws_security_group" "backend" {
 }
 
 resource "aws_security_group_rule" "backend_ingress_http" {
-  security_group_id = "${aws_security_group.backend.id}"
+  provider = aws.west
+
+  security_group_id = aws_security_group.backend.id
 
   type        = "ingress"
   protocol    = "tcp"
@@ -37,6 +51,8 @@ resource "aws_security_group_rule" "backend_ingress_http" {
 
 /*
 resource "aws_security_group_rule" "backend_ingress_http_nlb" {
+  provider = "aws.west"
+
   type        = "ingress"
   from_port   = 80
   to_port     = 80
@@ -47,7 +63,9 @@ resource "aws_security_group_rule" "backend_ingress_http_nlb" {
 */
 
 resource "aws_security_group_rule" "backend_egress_all" {
-  security_group_id = "${aws_security_group.backend.id}"
+  provider = aws.west
+
+  security_group_id = aws_security_group.backend.id
 
   type        = "egress"
   from_port   = 0
@@ -55,3 +73,4 @@ resource "aws_security_group_rule" "backend_egress_all" {
   protocol    = "-1"
   cidr_blocks = ["0.0.0.0/0"]
 }
+

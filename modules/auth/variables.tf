@@ -1,2 +1,6 @@
-variable "name" {}
-variable "zone_id" {}
+variable "name" {
+}
+
+variable "zone_id" {
+}
+

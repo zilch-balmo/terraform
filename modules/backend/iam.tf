@@ -1,15 +1,21 @@
 resource "aws_iam_role" "backend" {
+  provider = "aws.west"
+
   name               = "backend"
   assume_role_policy = "${data.aws_iam_policy_document.ecs.json}"
 }
 
 resource "aws_iam_role_policy" "backend" {
+  provider = "aws.west"
+
   name   = "backend"
   policy = "${data.aws_iam_policy_document.backend.json}"
   role   = "${aws_iam_role.backend.id}"
 }
 
 data "aws_iam_policy_document" "ecs" {
+  provider = "aws.west"
+
   statement {
     effect = "Allow"
 
@@ -25,6 +31,8 @@ data "aws_iam_policy_document" "ecs" {
 }
 
 data "aws_iam_policy_document" "backend" {
+  provider = "aws.west"
+
   statement {
     effect = "Allow"
 

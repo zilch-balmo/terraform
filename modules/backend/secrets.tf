@@ -1,4 +1,6 @@
 resource "aws_secretsmanager_secret" "rds_backend_password" {
+  provider = "aws.west"
+
   name = "rds_backend_password"
 }
 

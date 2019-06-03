@@ -1,3 +1,9 @@
-variable "name" {}
-variable "tier" {}
-variable "vpc_id" {}
+variable "name" {
+}
+
+variable "tier" {
+}
+
+variable "vpc_id" {
+}
+

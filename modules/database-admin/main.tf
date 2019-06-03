@@ -1,7 +1,9 @@
 data "aws_subnet_ids" "private" {
+  provider = "aws.west"
+
   vpc_id = "${var.vpc_id}"
 
-  tags {
+  tags = {
     Name = "${var.name}.private"
   }
 }
@@ -13,6 +15,8 @@ data "archive_file" "database_admin" {
 }
 
 resource "aws_lambda_function" "database_admin" {
+  provider = "aws.west"
+
   filename         = "${substr(data.archive_file.database_admin.output_path, length(path.cwd) + 1, -1)}"
   function_name    = "database_admin"
   handler          = "handler.main"
@@ -23,9 +27,7 @@ resource "aws_lambda_function" "database_admin" {
   timeout          = 5
 
   vpc_config {
-    subnet_ids = [
-      "${data.aws_subnet_ids.private.ids}",
-    ]
+    subnet_ids = data.aws_subnet_ids.private.ids
 
     security_group_ids = [
       "${var.security_group_id}",
@@ -40,6 +42,8 @@ resource "aws_lambda_function" "database_admin" {
 }
 
 resource "aws_lambda_alias" "database_admin" {
+  provider = "aws.west"
+
   name             = "default"
   description      = "Use latest version as default"
   function_name    = "${aws_lambda_function.database_admin.function_name}"
