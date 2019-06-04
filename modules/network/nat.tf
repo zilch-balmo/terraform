@@ -168,7 +168,7 @@ resource "aws_nat_gateway" "nat" {
 resource "aws_route_table" "private" {
   provider = "aws.west"
 
-  count  = "${local.min_az_count}"
+  count  = 0 // "${local.min_az_count}"
   vpc_id = "${aws_vpc.vpc.id}"
 
   route {
@@ -186,7 +186,7 @@ resource "aws_route_table" "private" {
 resource "aws_route_table_association" "private" {
   provider = "aws.west"
 
-  count          = "${local.min_az_count}"
+  count          = 0 // "${local.min_az_count}"
   subnet_id      = "${element(aws_subnet.private.*.id, count.index)}"
   route_table_id = "${element(aws_route_table.private.*.id, count.index)}"
 }

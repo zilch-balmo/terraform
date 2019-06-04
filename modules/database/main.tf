@@ -25,7 +25,11 @@ resource "aws_db_subnet_group" "postgres" {
 
   name = "${var.name}.postgres"
 
-  subnet_ids = data.aws_subnet_ids.private.ids
+  subnet_ids = [
+    "subnet-06575047b30de816e",
+    "subnet-0dfcd5179ae1d5bfc",
+  ]
+  // data.aws_subnet_ids.private.ids
 
   tags = {
     Name = "${var.name}.postgres"
@@ -41,7 +45,7 @@ resource "aws_db_instance" "postgres" {
 
   allocated_storage         = 20
   db_subnet_group_name      = aws_db_subnet_group.postgres.name
-  deletion_protection       = true
+  deletion_protection       = false
   engine                    = "postgres"
   engine_version            = "11.1"
   final_snapshot_identifier = "${var.name}-final"
